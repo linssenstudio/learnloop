@@ -1,5 +1,10 @@
-import { Placeholder } from "@/components/placeholder";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/session";
+import { listFiles } from "@/lib/files";
+import { LibraryClient } from "@/components/library-client";
 
-export default function LibraryPage() {
-  return <Placeholder title="知识库" note="资料上传、解析与检索将在 Wave 2 提供" />;
+export default async function LibraryPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  return <LibraryClient initialFiles={listFiles(user.id)} />;
 }

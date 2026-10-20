@@ -68,7 +68,8 @@ CREATE INDEX IF NOT EXISTS idx_source_chunks_user_id ON source_chunks(user_id);
 CREATE VIRTUAL TABLE IF NOT EXISTS chunk_fts USING fts5(
   text,
   content='source_chunks',
-  content_rowid='rowid'
+  content_rowid='rowid',
+  tokenize='trigram'
 );
 
 CREATE TRIGGER IF NOT EXISTS chunk_fts_insert AFTER INSERT ON source_chunks BEGIN
@@ -289,8 +290,34 @@ CREATE TABLE IF NOT EXISTS usage_records (
 CREATE INDEX IF NOT EXISTS idx_usage_records_user_id ON usage_records(user_id);
 `;
 
+function migrateChunkFtsToTrigram(): void {
+  const row = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'chunk_fts'")
+    .get() as { sql: string } | undefined;
+  if (row && !row.sql.includes("trigram")) {
+    db.exec(`
+      DROP TRIGGER IF EXISTS chunk_fts_insert;
+      DROP TRIGGER IF EXISTS chunk_fts_delete;
+      DROP TRIGGER IF EXISTS chunk_fts_update;
+      DROP TABLE chunk_fts;
+    `);
+  }
+}
+
 export function initDb(): void {
+  migrateChunkFtsToTrigram();
   db.exec(SCHEMA);
+  const ftsRow = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'chunk_fts'")
+    .get() as { sql: string } | undefined;
+  if (ftsRow) {
+    const needsRebuild =
+      (db.prepare("SELECT COUNT(*) c FROM source_chunks").get() as { c: number }).c > 0 &&
+      (db.prepare("SELECT COUNT(*) c FROM chunk_fts").get() as { c: number }).c === 0;
+    if (needsRebuild) {
+      db.exec("INSERT INTO chunk_fts(chunk_fts) VALUES ('rebuild')");
+    }
+  }
 }
 
 initDb();
