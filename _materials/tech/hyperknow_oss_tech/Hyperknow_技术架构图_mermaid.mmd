@@ -1,0 +1,24 @@
+flowchart TB
+  U[学习者 / 教师 / 管理员] --> UI[Next.js 统一学习工作台]
+  UI --> API[自研：API / 账号 / 课程 / 权限 / 任务状态]
+  API --> CORE[自研：AI 教师 / 教学状态机 / 课程生成 / 掌握度记忆]
+  CORE --> LG[复用：LangGraph 调度]
+  CORE --> RAG[改造：课程 RAG 与来源引证]
+  CORE --> BOARD[改造：Excalidraw + Tutori 风格指令白板]
+  CORE --> AUDIO[改造：Whisper STT + CosyVoice TTS]
+  CORE --> STUDIO[改造：Open Notebook / LibreNote 学习资料流水线]
+  CORE --> QUIZ[改造：测验 + ts-fsrs 间隔复习]
+  CORE --> VIDEO[改造：Manim + TTS + FFmpeg 讲解视频]
+  CORE --> CAL[改造：FullCalendar + 任务调度]
+  RAG --> DOCLING[复用：Docling 文档解析]
+  RAG --> DB[(复用：PostgreSQL + pgvector)]
+  CORE --> DB
+  BOARD --> OBJ[(对象存储：图片/板书/视频)]
+  VIDEO --> OBJ
+  STUDIO --> OBJ
+  classDef reuse fill:#E3F1E8,stroke:#70AF83,color:#17552A
+  classDef adapt fill:#FFF0D5,stroke:#E5AF55,color:#74500C
+  classDef own fill:#FFE3E5,stroke:#D98E9A,color:#802D40
+  class LG,DOCLING,DB,OBJ reuse
+  class RAG,BOARD,AUDIO,STUDIO,QUIZ,VIDEO,CAL adapt
+  class UI,API,CORE own

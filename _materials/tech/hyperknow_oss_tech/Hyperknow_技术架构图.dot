@@ -1,0 +1,46 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="#F7F9FD", pad="0.35", nodesep="0.29", ranksep="0.60", splines=ortho, fontname="Noto Sans CJK SC", label="HYPERKNOW 全功能复刻｜开源组合技术架构", labelloc=t, fontsize=27, fontcolor="#1B2942", compound=true, dpi=170];
+ node [shape=box, style="rounded,filled", fillcolor=white, color="#CBD6E5", penwidth=1.2, fontname="Noto Sans CJK SC", fontsize=13, fontcolor="#1B2942", margin="0.16,0.13"];
+ edge [color="#96A6BE", arrowsize=0.65, penwidth=1.4];
+ users [label="学习者 / 教师 / 管理员", fillcolor="#DDEBFF", color="#6DA5FA", fontsize=16];
+ subgraph cluster_ui {
+ label="01｜统一 Web 学习工作台 · Next.js / React"; style="rounded,filled"; fillcolor="#ECF3FF"; color="#B8CEF2"; fontsize=17; fontcolor="#294A7F";
+ u1 [label="课程首页 · 上传资料\n学习目标 · 章节目录",fillcolor="#E3F1E8",color="#7DBD90"];
+ u2 [label="互动课堂 · 白板\n文字/语音/课堂回放",fillcolor="#FFF0D5",color="#E5AF55"];
+ u3 [label="学习产物 · 习题\n笔记/视频/闪卡",fillcolor="#E3F1E8",color="#7DBD90"];
+ u4 [label="学习计划 · 进度\n日历/错题/掌握度",fillcolor="#FFE3E5",color="#D98E9A"];
+ {rank=same;u1;u2;u3;u4;}
+ }
+ gateway [label="统一 API / 权限 / 用户 / 课程 ID / 任务状态 / SSE 或 WebSocket\n(自研边界层：Next API + FastAPI)",fillcolor="#FFE3E5",color="#D98E9A",fontsize=14];
+ subgraph cluster_intelligence {
+ label="02｜自研的教学中枢 · LangGraph 做编排，业务决策自研"; style="rounded,filled"; fillcolor="#FDF0F1"; color="#E7BCC3"; fontsize=17; fontcolor="#8B4050";
+ tutor [label="AI 教师状态机 ★\n讲解 → 提问 → 纠错 → 反馈",fillcolor="#FFE3E5",color="#D98E9A",fontsize=14];
+ course [label="课程规划引擎 ★\n先修关系/章节/学习目标",fillcolor="#FFE3E5",color="#D98E9A"];
+ mastery [label="掌握度与长期记忆 ★\n学习证据/弱点/复习建议",fillcolor="#FFE3E5",color="#D98E9A"];
+ {rank=same;tutor;course;mastery;}
+ }
+ subgraph cluster_features {
+ label="03｜功能模块：绿色直接复用 ｜ 黄色二次开发"; style="rounded,filled"; fillcolor="#FFFCF5"; color="#EAD8A5"; fontsize=17; fontcolor="#7D5D29";
+ ingestion [label="资料处理\nDocling / Whisper", fillcolor="#E3F1E8",color="#7DBD90"];
+ knowledge [label="知识检索与引证\npgvector + RAG", fillcolor="#FFF0D5",color="#E5AF55"];
+ board [label="AI板书/课堂重放\nExcalidraw + 命令协议",fillcolor="#FFF0D5",color="#E5AF55"];
+ voice [label="语音课堂\nCosyVoice + Faster Whisper",fillcolor="#FFF0D5",color="#E5AF55"];
+ study [label="学习资料生成\nLibreNote/Open Notebook参考",fillcolor="#FFF0D5",color="#E5AF55"];
+ spaced [label="复习计划\nts-fsrs + 日历",fillcolor="#E3F1E8",color="#7DBD90"];
+ video [label="讲解视频\nManim + TTS + FFmpeg",fillcolor="#FFF0D5",color="#E5AF55"];
+ schedule [label="后台工作流\nTrigger.dev / Celery",fillcolor="#E3F1E8",color="#7DBD90"];
+ {rank=same;ingestion;knowledge;board;voice;}
+ {rank=same;study;spaced;video;schedule;}
+ }
+ subgraph cluster_data {
+ label="04｜基础设施与共同数据模型"; style="rounded,filled"; fillcolor="#EFF3F8"; color="#C5D0DE"; fontsize=17; fontcolor="#4C617A";
+ db [label="PostgreSQL + pgvector\n用户 · 课程 · 知识点 · 学习证据",fillcolor="#DDEBFF",color="#89A8D6"];
+ obj [label="对象存储 S3/MinIO\n原件 · 图表 · 录音 · 视频",fillcolor="#DDEBFF",color="#89A8D6"];
+ ai [label="模型网关 · 可替换LLM\n生成/Embedding/重排/视觉",fillcolor="#DDEBFF",color="#89A8D6"];
+ ops [label="观察性与质量检测\n日志 · 成本 · Playwright",fillcolor="#DDEBFF",color="#89A8D6"];
+ {rank=same;db;obj;ai;ops;}
+ }
+ users -> u2 [style=invis]; users -> gateway; u1->gateway [style=invis]; u2->gateway [style=invis]; u3->gateway [style=invis]; u4->gateway [style=invis]; gateway->tutor; gateway->course; gateway->mastery; tutor->board; tutor->voice; tutor->knowledge; course->ingestion; mastery->spaced; course->study; course->video; knowledge->db; ingestion->obj; board->obj; voice->ai; video->schedule; study->db; spaced->db; schedule->ops;
+ note [label="图例  ● 绿色：直接复用开源部件     ● 黄色：在开源基础上改造     ● 粉色：平台必须自研      ★ = 核心壁垒", shape=plaintext, fontsize=14,fontcolor="#4A5A72"];
+ ops->note [style=invis];
+}

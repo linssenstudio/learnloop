@@ -1,0 +1,22 @@
+﻿项目,GitHub/参考地址,代码许可证,工程成熟度,整合难度,复用建议,适用能力或重要风险
+Open Notebook,https://github.com/lfnovo/open-notebook,MIT,高,中,参考/可复用后端,完整文档工作台、RAG引证、笔记、音频；独立SurrealDB体系，且偏单用户
+LibreNote AI,https://github.com/devyanshyadav/librenote-ai,MIT,低-中,中,备选可Fork底座,Next.js/Supabase、登录、RAG、闪卡、测验、思维导图；仓库小，需先跑集成测试
+Cortex,https://github.com/PndaMan/cortex,Apache-2.0,中（产品早期）,高,参考/移植算法,闪卡FSRS、学习分析、日历、讲义；Tauri/Rust/Svelte桌面架构
+NotebookLM-Lite,https://github.com/LRriver/NotebookLM-Lite,Apache-2.0,低-中,中,备选学习资料工作流,思维导图/报告/闪卡/音频/幻灯片；视频功能尚为占位
+Docling,https://github.com/docling-project/docling,MIT,高,低-中,直接复用,PDF/PPTX/DOCX布局解析与结构化抽取；OCR/依赖另行核查
+pgvector,https://github.com/pgvector/pgvector,PostgreSQL License,高,低,直接复用,PG向量检索，和课程/用户表同库存储
+LangGraph,https://github.com/langchain-ai/langgraph,MIT,高,中,直接复用编排框架,可恢复状态图/工具调用；教学策略、课程策划仍需自研
+Mem0,https://github.com/mem0ai/mem0,Apache-2.0,高,中,可选复用学习者偏好记忆,持久个人偏好/上下文记忆；不能代替客观知识掌握度的评估表
+Graphiti,https://github.com/getzep/graphiti,Apache-2.0,高,中-高,可选知识图谱增强,可追溯实体关系/时间语义；通常需要额外图数据库，先不上MVP
+Mermaid,https://github.com/mermaid-js/mermaid,MIT,高,低,直接复用示意图生成,知识关系、流程图、章节结构图，非完全手绘可编辑白板
+Excalidraw,https://github.com/excalidraw/excalidraw,MIT,高,中,直接复用画布/二次开发事件协议,可编辑矢量白板，需开发AI板书命令与语音同步
+Tutori,https://github.com/SSHdotCodes/tutori,Apache-2.0,低（演示型）,中-高,二次开发/架构参考,语音+连续手绘板书、图形命令；Gradio工程需迁移到Web
+AI Tutor with Live Whiteboard,https://github.com/sairam356/AI-Tutor-with-Live-Whiteboard,MIT（仓库）,低（演示型）,高,仅参考工作流,React/LangGraph.js/tldraw；tldraw正式商用需独立购买许可证
+HeyTutor,https://github.com/kaizen403/heytutor,未确认许可证,低-中,不建议复制源码,仅作技术参考,验证图形后再同步讲解；目前未核实可授权复制代码
+ts-fsrs,https://github.com/open-spaced-repetition/ts-fsrs,MIT,中-高,低,直接复用,闪卡间隔复习调度，学习掌握度仍需自研
+Faster Whisper,https://github.com/SYSTRAN/faster-whisper,MIT,高,低-中,直接复用,语音识别/音频转写；实时流式与话轮管理需额外实现
+CosyVoice,https://github.com/QwenAudio/CosyVoice,Apache-2.0（代码；模型单独核查）,高（研发活跃）,中-高,直接复用TTS服务,中文语音授课，可流式；服务器GPU、模型和第三方依赖许可证需核查
+Manim Community,https://github.com/ManimCommunity/manim,MIT,高,中-高,直接复用渲染引擎,数学/机制动画画面；自动教学脚本、配音、字幕、视频拼装自研
+FullCalendar Standard,https://github.com/fullcalendar/fullcalendar,MIT（标准版）,高,低,直接复用日历UI,日程视图与拖拽；Premium不是免费商用
+Trigger.dev,https://github.com/triggerdotdev/trigger.dev,Apache-2.0（仓库）,高,中,直接复用任务系统,后台课程生成、异步视频任务、重试、定时队列；托管服务另算
+Playwright,https://github.com/microsoft/playwright,Apache-2.0,高,低-中,直接复用测试工具,自动化端到端操作回归；测试样例仍需自己设计
