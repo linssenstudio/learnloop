@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { href: "/library", label: "知识库", icon: "▦" },
   { href: "/tools", label: "学习工具", icon: "⚒" },
   { href: "/planner", label: "学习计划", icon: "◷" },
-  { href: "/growth", label: "我的成长", icon: "↗" },
+  { href: "/progress", label: "我的成长", icon: "↗" },
   { href: "/settings", label: "设置", icon: "⚙" },
 ];
 

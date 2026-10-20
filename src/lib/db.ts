@@ -144,6 +144,7 @@ CREATE TABLE IF NOT EXISTS teaching_sessions (
   lesson_id TEXT REFERENCES lessons(id) ON DELETE CASCADE,
   state TEXT NOT NULL DEFAULT 'explain' CHECK (state IN ('explain','check','remediate','advance','apply','summarize','done')),
   step INTEGER NOT NULL DEFAULT 0,
+  context TEXT,
   created_at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_teaching_sessions_user_id ON teaching_sessions(user_id);
@@ -304,9 +305,17 @@ function migrateChunkFtsToTrigram(): void {
   }
 }
 
+function migrateTeachingSessionsContext(): void {
+  const cols = db.prepare("PRAGMA table_info(teaching_sessions)").all() as { name: string }[];
+  if (cols.length > 0 && !cols.some((c) => c.name === "context")) {
+    db.exec("ALTER TABLE teaching_sessions ADD COLUMN context TEXT");
+  }
+}
+
 export function initDb(): void {
   migrateChunkFtsToTrigram();
   db.exec(SCHEMA);
+  migrateTeachingSessionsContext();
   const ftsRow = db
     .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'chunk_fts'")
     .get() as { sql: string } | undefined;

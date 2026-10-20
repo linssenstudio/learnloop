@@ -275,3 +275,13 @@ export function getCourseDetail(courseId: string): CourseDetail | null {
     progress: { total: lessons.length, done: lessons.filter((l) => l.status === "done").length },
   };
 }
+
+export function rollupUnitStatus(courseId: string): void {
+  db.prepare(
+    `UPDATE course_units SET status = 'done'
+     WHERE course_id = ?
+       AND status != 'done'
+       AND EXISTS (SELECT 1 FROM lessons l WHERE l.unit_id = course_units.id)
+       AND NOT EXISTS (SELECT 1 FROM lessons l WHERE l.unit_id = course_units.id AND l.status != 'done')`
+  ).run(courseId);
+}

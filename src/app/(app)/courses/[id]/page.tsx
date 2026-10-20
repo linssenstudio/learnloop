@@ -93,6 +93,16 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
 
         <aside className="space-y-4 lg:col-span-2">
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+            <h2 className="mb-3 font-medium">学习产出</h2>
+            <Link
+              href={`/courses/${course.id}/flashcards`}
+              className="block rounded-lg border border-zinc-700 px-3 py-2 text-center text-sm text-zinc-300 transition hover:border-indigo-600 hover:text-indigo-300"
+            >
+              闪卡复习
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
             <h2 className="mb-3 font-medium">课程信息</h2>
             <dl className="space-y-3 text-sm">
               {course.goal_text && (

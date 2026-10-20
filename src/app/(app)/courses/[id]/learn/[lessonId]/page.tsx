@@ -1,5 +1,27 @@
-import { Placeholder } from "@/components/placeholder";
+import { notFound, redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/session";
+import { getCourseDetail, getOwnedCourse } from "@/lib/courses";
+import { Classroom } from "@/components/classroom";
+import { db } from "@/lib/db";
 
-export default function LearnPage() {
-  return <Placeholder title="课堂" note="AI 三栏课堂（讲解 / 板书 / 随堂测）将在 Wave 4 提供" badge="开发中（Wave 4）" />;
+export default async function LearnPage({ params }: { params: Promise<{ id: string; lessonId: string }> }) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  const { id, lessonId } = await params;
+  if (!getOwnedCourse(user.id, id)) notFound();
+  const lesson = db.prepare("SELECT id FROM lessons WHERE id = ? AND course_id = ?").get(lessonId, id);
+  if (!lesson) notFound();
+  const detail = getCourseDetail(id);
+  if (!detail) notFound();
+  return (
+    <Classroom
+      courseId={id}
+      lessonId={lessonId}
+      units={detail.units.map((u) => ({
+        id: u.id,
+        title: u.title,
+        lessons: u.lessons.map((l) => ({ id: l.id, title: l.title, status: l.status })),
+      }))}
+    />
+  );
 }
