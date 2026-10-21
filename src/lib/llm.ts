@@ -2,9 +2,14 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { db } from "./db";
 
-const BASE_URL = process.env.LLM_BASE_URL ?? "https://api.moonshot.cn/v1";
-const MODEL = process.env.LLM_MODEL ?? "kimi-k2-0711-preview";
-const TIMEOUT_MS = Number(process.env.LLM_TIMEOUT_MS ?? 60_000);
+export function llmConfig(): { baseUrl: string; apiKey: string; model: string; timeoutMs: number } {
+  return {
+    baseUrl: (process.env.LLM_BASE_URL ?? "https://api.moonshot.cn/v1").replace(/\/$/, ""),
+    apiKey: process.env.LLM_API_KEY ?? "",
+    model: process.env.LLM_MODEL ?? "kimi-k2-0711-preview",
+    timeoutMs: Number(process.env.LLM_TIMEOUT_MS ?? 60_000),
+  };
+}
 
 export class LlmNotConfiguredError extends Error {
   constructor() {
@@ -42,23 +47,23 @@ async function callChat(
   messages: ChatMessage[],
   opts: { json: boolean; maxTokens?: number; userId?: string }
 ): Promise<CompletionResult> {
-  const apiKey = process.env.LLM_API_KEY;
-  if (!apiKey) throw new LlmNotConfiguredError();
+  const cfg = llmConfig();
+  if (!cfg.apiKey) throw new LlmNotConfiguredError();
 
-  const res = await fetch(`${BASE_URL.replace(/\/$/, "")}/chat/completions`, {
+  const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${cfg.apiKey}`,
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: cfg.model,
       messages,
       temperature: 0.3,
       ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
       ...(opts.json ? { response_format: { type: "json_object" } } : {}),
     }),
-    signal: AbortSignal.timeout(TIMEOUT_MS),
+    signal: AbortSignal.timeout(cfg.timeoutMs),
   });
 
   if (!res.ok) {
@@ -75,16 +80,16 @@ async function callChat(
 
   const promptTokens = data.usage?.prompt_tokens ?? 0;
   const completionTokens = data.usage?.completion_tokens ?? 0;
-  recordUsage(opts.userId ?? null, opts.json ? "chat_json" : "chat_text", promptTokens, completionTokens);
+  recordUsage(opts.userId ?? null, opts.json ? "chat_json" : "chat_text", cfg.model, promptTokens, completionTokens);
 
   return { content, promptTokens, completionTokens };
 }
 
-function recordUsage(userId: string | null, kind: string, promptTokens: number, completionTokens: number) {
+function recordUsage(userId: string | null, kind: string, model: string, promptTokens: number, completionTokens: number) {
   try {
     db.prepare(
       "INSERT INTO usage_records (id, user_id, kind, model, prompt_tokens, completion_tokens, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
-    ).run(randomUUID(), userId, kind, MODEL, promptTokens, completionTokens, Date.now());
+    ).run(randomUUID(), userId, kind, model, promptTokens, completionTokens, Date.now());
   } catch {
     // 用量记录失败不阻断主流程
   }

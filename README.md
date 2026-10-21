@@ -1,29 +1,68 @@
-# LearnLoop — AI 智能学习工作台
+# LearnLoop
 
-对标 Hyperknow 公开功能的**原创实现**（不使用其商标、素材与私有代码）。从「提出学习目标」到「学会并能迁移应用」的完整闭环：学习目标 → 资料摄取 → 水平诊断 → 课程生成 → AI 教师授课 → 测验批改 → 错因补救 → 掌握度记忆 → 复习与计划。
-
-## 快速开始
-
-```bash
-npm install
-cp .env.example .env.local   # 填入 LLM_API_KEY（任意 OpenAI 兼容端点，默认 Moonshot/Kimi）
-npm run dev                  # http://localhost:3000
-```
-
-未配置 `LLM_API_KEY` 时平台照常运行，所有 AI 接口返回 `503 LLM_NOT_CONFIGURED` 并显示配置指引——**没有任何假数据或预写回复**。
+原创品牌 AI 学习工作台：上传资料建成知识库，AI 为你诊断基础、规划课程大纲，并以小步教学法带你上课——讲解、提问、补救、测验、结课产出笔记与闪卡，配合掌握度跟踪与间隔重复复习，形成完整的学习闭环。
 
 ## 技术栈
 
-Next.js (App Router) + TypeScript + Tailwind · better-sqlite3 (WAL, FTS5-trigram) · scrypt 会话认证 · OpenAI 兼容模型网关（zod 契约校验 + token 用量记录）。架构取舍见 `docs/02-adr-0001-stack.md`。
+- Next.js（App Router）+ TypeScript + Tailwind CSS v4，前后端同进程
+- SQLite（better-sqlite3，WAL 模式）+ FTS5 全文检索（trigram 分词，中文友好）
+- LLM 网关：任意 OpenAI 兼容端点（默认 Moonshot/Kimi）
+- 本地文件存储（`data/uploads/`），零外部服务依赖（除 LLM API）
 
-## 文档
+## 快速开始
 
-- `docs/01-gap-analysis.md` — F01–F26 功能差距表
-- `docs/02-adr-0001-stack.md` — 技术栈 ADR
-- `docs/03-data-model.md` — 数据库设计（21 表）
-- `docs/04-task-list.md` — P0 任务清单与 LLM JSON 契约
-- `docs/05-sprint-1-report.md` — Sprint 1 验证结果、覆盖率、已知缺陷、P1 计划
+环境要求：Node.js ≥ 20（推荐 22+）。
 
-## 测试夹具
+### 方式一：接入向导（推荐）
 
-`node scripts/fixtures/generate.mjs` 生成中文 sample.pdf / sample.docx / sample.pptx 用于上传解析验证。
+```bash
+git clone <repo-url> && cd learnloop
+npm install
+npm run dev
+```
+
+打开 http://localhost:3000 ，会自动进入 **API 接入向导**：选择服务商预设（Moonshot 国内/国际）或自定义端点 → 粘贴 API Key → 测试连接 → 选择模型 → 保存并开始。全程约 30 秒，无需重启。
+
+还没有 Key？可去 [platform.moonshot.cn](https://platform.moonshot.cn) 免费获取。
+
+### 方式二：手动配置（服务器/无头部署）
+
+在项目根目录创建 `.env.local`：
+
+```bash
+LLM_BASE_URL=https://api.moonshot.cn/v1
+LLM_API_KEY=sk-your-key-here
+LLM_MODEL=kimi-k2-0711-preview
+```
+
+参考 `.env.example`。之后 `npm run dev` 即可。向导保存与手动编辑完全等价，随时可互相覆盖。
+
+> `.env.local` 与 `data/`（数据库、上传文件）均已加入 `.gitignore`，不会被提交。
+
+## 功能地图
+
+| 模块 | 路径 | 说明 |
+| --- | --- | --- |
+| 接入向导 | /setup | 首次启动自动进入，已配置后需登录修改 |
+| 工作台 | /dashboard | 最近课程、今日待办、连续学习天数 |
+| 知识库 | /library | PDF/DOCX/PPTX 上传解析、全文检索、按页引用 |
+| 课程 | /courses | 三步向导（目标→诊断→大纲）、课程主页、大纲编辑 |
+| 课堂 | /courses/[id]/learn/[lessonId] | 小步教学状态机、随堂测验、引用面板 |
+| 学习计划 | /planner | 结课自动生成复习任务 |
+| 我的成长 | /progress | 概念掌握度、错题本 |
+| 闪卡 | /courses/[id]/flashcards | SM-2 间隔重复 |
+| 设置 | /settings | 模型接入查看与重新配置 |
+
+## 常用命令
+
+```bash
+npm run dev     # 开发
+npm run build   # 生产构建
+npm start       # 生产运行
+node scripts/fixtures/generate.mjs   # 生成测试用 PDF/DOCX/PPTX
+npx tsx scripts/test-wave4.ts        # 非 LLM 链路单测（掌握度/SM-2/单元汇总）
+```
+
+## 设计文档
+
+见 `docs/`：差距分析、ADR-0001 技术栈、数据模型、P0 任务清单。
