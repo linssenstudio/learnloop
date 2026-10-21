@@ -16,7 +16,7 @@
 ### 方式一：接入向导（推荐）
 
 ```bash
-git clone <repo-url> && cd learnloop
+git clone https://github.com/linssenstudio/learnloop.git && cd learnloop
 npm install
 npm run dev
 ```
@@ -63,6 +63,25 @@ node scripts/fixtures/generate.mjs   # 生成测试用 PDF/DOCX/PPTX
 npx tsx scripts/test-wave4.ts        # 非 LLM 链路单测（掌握度/SM-2/单元汇总）
 ```
 
+## 项目状态与路线图
+
+**当前：P0 已完成**——注册登录、资料上传解析与引用检索、课程诊断与大纲生成、AI 小步教学（讲解/提问/答错补救）、随堂测验批改、掌握度与错题本、闪卡间隔复习、学习计划、数据持久化（重启完整恢复）。功能覆盖明细与验收结果见 `docs/05-sprint-1-report.md`。
+
+- **P1（进行中/下一步）**：互动白板（Excalidraw + 结构化板书协议）、Deep Learn 连续单元学习、速查表、知识图谱、日历视图、学习者画像
+- **P2**：AI 讲解视频、深度研究、多格式导出、教师风格自定义、模型路由与用量管理
+- **P3**：LMS 集成（授权后）、课程广场、实时语音、班级/教师后台
+
+> 合规说明：本项目参考 Hyperknow 的**公开功能**进行原创实现，不使用其商标、素材与私有代码。所有 AI 生成内容均来自你自己配置的模型与你上传的资料。
+
 ## 设计文档
 
-见 `docs/`：差距分析、ADR-0001 技术栈、数据模型、P0 任务清单。
+见 `docs/`：
+- `01-gap-analysis.md` — 功能差距表（F01–F26 对标清单）
+- `02-adr-0001-stack.md` — 技术栈决策记录
+- `03-data-model.md` — 数据库设计（21 张表，含掌握度规则）
+- `04-task-list.md` — P0 任务清单与 LLM JSON 契约
+- `05-sprint-1-report.md` — Sprint 1 验证结果、已知缺陷、P1 计划
+
+## License
+
+[MIT](LICENSE)
